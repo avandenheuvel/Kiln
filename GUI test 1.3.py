@@ -5,6 +5,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import random
 import time
+import sqlite3 #Not yet implemented
+from datetime import datetime
 
 class TemperatureControllerApp(tk.Tk):
     def __init__(self):
@@ -39,42 +41,50 @@ class TemperatureControllerApp(tk.Tk):
         self.main_screen = ttk.Frame(self)
         self.main_screen.pack(fill="both", expand=True)
 
+        # Job Name
+        self.label_job_name = ttk.Label(self.main_screen, text="Job Name:")
+        self.label_job_name.grid(row=0, column=0, padx=10, pady=5)
+        self.job_name = tk.StringVar()
+        self.entry_job_name = ttk.Entry(self.main_screen, textvariable=self.job_name)
+        self.entry_job_name.grid(row=0, column=1, padx=10, pady=5)
+
+
         # Labels and Input boxes for temperature setpoints
         self.label_setpoint_1 = ttk.Label(self.main_screen, text="Setpoint 1:")
-        self.label_setpoint_1.grid(row=0, column=0, padx=10, pady=5)
+        self.label_setpoint_1.grid(row=1, column=0, padx=10, pady=5)
         self.setpoint_1 = tk.DoubleVar()
         self.entry_setpoint_1 = ttk.Entry(self.main_screen, textvariable=self.setpoint_1)
-        self.entry_setpoint_1.grid(row=0, column=1, padx=10, pady=5)
+        self.entry_setpoint_1.grid(row=1, column=1, padx=10, pady=5)
 
         self.label_setpoint_2 = ttk.Label(self.main_screen, text="Setpoint 2:")
-        self.label_setpoint_2.grid(row=1, column=0, padx=10, pady=5)
+        self.label_setpoint_2.grid(row=2, column=0, padx=10, pady=5)
         self.setpoint_2 = tk.DoubleVar()
         self.entry_setpoint_2 = ttk.Entry(self.main_screen, textvariable=self.setpoint_2)
-        self.entry_setpoint_2.grid(row=1, column=1, padx=10, pady=5)
+        self.entry_setpoint_2.grid(row=2, column=1, padx=10, pady=5)
 
         # Heaters Control
         self.heater_output_1 = tk.DoubleVar()
         self.heater_output_2 = tk.DoubleVar()
 
         self.label_heater_output_1 = ttk.Label(self.main_screen, text="Heater Output 1:")
-        self.label_heater_output_1.grid(row=2, column=0, padx=10, pady=5)
+        self.label_heater_output_1.grid(row=3, column=0, padx=10, pady=5)
         self.label_heater_output_1_value = ttk.Label(self.main_screen, textvariable=self.heater_output_1)
-        self.label_heater_output_1_value.grid(row=2, column=1, padx=10, pady=5)
+        self.label_heater_output_1_value.grid(row=4, column=1, padx=10, pady=5)
 
         self.label_heater_output_2 = ttk.Label(self.main_screen, text="Heater Output 2:")
         self.label_heater_output_2.grid(row=3, column=0, padx=10, pady=5)
         self.label_heater_output_2_value = ttk.Label(self.main_screen, textvariable=self.heater_output_2)
-        self.label_heater_output_2_value.grid(row=3, column=1, padx=10, pady=5)
+        self.label_heater_output_2_value.grid(row=4, column=1, padx=10, pady=5)
 
         # code for the buttons with the modified code
         self.button_toggle_heater_1 = ttk.Button(self.main_screen, text="Heater 1: OFF", style="Off.TButton", command=self.toggle_heater_1)
-        self.button_toggle_heater_1.grid(row=4, column=0, padx=10, pady=5)
+        self.button_toggle_heater_1.grid(row=5, column=0, padx=10, pady=5)
 
         self.button_toggle_heater_2 = ttk.Button(self.main_screen, text="Heater 2: OFF", style="Off.TButton", command=self.toggle_heater_2)
-        self.button_toggle_heater_2.grid(row=4, column=1, padx=10, pady=5)
+        self.button_toggle_heater_2.grid(row=5, column=1, padx=10, pady=5)
 
         # Graph trend
-        self.figure = plt.Figure(figsize=(6, 4), dpi=100)
+        self.figure = plt.Figure(figsize=(6, 3), dpi=100)
         self.ax = self.figure.add_subplot(111)
         self.ax.set_xlabel("Time (seconds)")
         self.ax.set_ylabel("Temperature / Setpoint / Heater Output (%)")
@@ -157,9 +167,9 @@ class TemperatureControllerApp(tk.Tk):
     def update_data_simulation(self):
         # Simulate data
         current_time = time.strftime("%H:%M:%S")
-        temperature = random.uniform(25, 30)
-        output = random.uniform(0, 100)
-        setpoint = random.uniform(25, 30)
+        temperature = random.uniform(135, 155)
+        output = random.uniform(70, 100)
+        setpoint = random.uniform(145, 150)
 
         # Add data to arrays
         self.time_values.append(current_time)
@@ -181,7 +191,7 @@ class TemperatureControllerApp(tk.Tk):
         self.animation = self.after(1000, self.update_data_simulation)
 
     def init_graph(self):
-        self.graph_fig = Figure(figsize=(6, 4), dpi=100)
+        self.graph_fig = Figure(figsize=(6, 3), dpi=100)
         self.graph_ax = self.graph_fig.add_subplot(111)
         self.graph_ax.set_xlabel('Time')
         self.graph_ax.set_ylabel('Value')
